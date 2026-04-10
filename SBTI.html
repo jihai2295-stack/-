@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>恋爱人格测试 (SBTI 抽象版)</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(135deg,#ffd6ec,#c8e8ff);
+    font-family:"Microsoft YaHei";
+}
+
+/* 卡片 */
+.container{
+    width:90%;
+    max-width:420px;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(20px);
+    border-radius:25px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* 标题 */
+.title{
+    text-align:center;
+    font-size:24px;
+    font-weight:bold;
+    background: linear-gradient(90deg,#ff6ec7,#6a5cff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+/* 选项 */
+.option{
+    margin-top:12px;
+    padding:14px;
+    border-radius:18px;
+    background: rgba(255,255,255,0.8);
+    cursor:pointer;
+    transition:0.2s;
+    font-size: 14px;
+    line-height: 1.4;
+}
+.option:hover{
+    transform:scale(1.02);
+    background:#fff;
+}
+
+/* 按钮 */
+.btn{
+    margin-top:20px;
+    padding:15px;
+    border-radius:20px;
+    background: linear-gradient(135deg,#ff9bd3,#8ec5ff);
+    color:#fff;
+    text-align:center;
+    cursor:pointer;
+    font-weight: bold;
+}
+
+/* 进度 */
+.bar{height:6px;background:#eee;border-radius:5px;margin-bottom: 20px;}
+.inner{height:100%;width:0;background:linear-gradient(90deg,#ff9bd3,#6a5cff);transition: 0.3s;}
+
+.hidden{display:none;}
+
+#desc {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    background: rgba(255,255,255,0.4);
+    padding: 15px;
+    border-radius: 15px;
+    margin: 15px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="start">
+    <div class="title">恋爱人格测试</div>
+    <p style="text-align:center; color: #666; margin-bottom: 5px;">测出你在关系中的真实(抽象)模式</p>
+    
+    <div style="text-align:center; font-size: 12px; color: #999; margin-bottom: 20px;">
+        <span>原作者：@懒猫</span>
+        <br>
+        <span>抖音：@Lm_060526</span>
+    </div>
+
+    <div class="btn" onclick="start()">开始进入发疯模式</div>
+    
+    <p style="text-align:center; font-size: 11px; color: #bbb; margin-top: 15px;">纯属娱乐 玻璃心勿扰</p>
+</div>
+
+<div id="quiz" class="hidden">
+    <div class="bar"><div id="bar" class="inner"></div></div>
+    <h3 id="q" style="margin-bottom: 20px; font-size: 18px; color: #333;"></h3>
+    <div id="opts"></div>
+</div>
+
+<div id="res" class="hidden" style="text-align:center;">
+    <p style="font-size: 12px; color: #888; margin-bottom: 5px;">你的测试结果为：</p>
+    <h2 id="code" style="margin: 0; color: #ff6ec7;"></h2>
+    <h3 id="title" style="margin: 10px 0; color: #6a5cff;"></h3>
+    <div id="desc"></div>
+    
+    <div style="margin: 20px 0; padding: 15px; border-top: 1px dashed #ddd; font-size: 13px; color: #777;">
+        <p style="margin: 5px 0;">原作者：<strong>@懒猫Club</strong></p>
+        <p style="margin: 5px 0;">抖音原创：<strong>@KONIC</strong></p>
+        <p style="margin: 10px 0 0; font-size: 11px; opacity: 0.6;">纯属娱乐 玻璃心勿扰</p>
+    </div>
+
+    <div class="btn" onclick="location.reload()">不服？再测一次</div>
+</div>
+
+</div>
+
+<script>
+
+const allQuestions = [
+    { 
+        q: "深夜突然想起前任，你的第一反应是？", 
+        opts: [
+            { text: "发条仅TA可见的伤感朋友圈，并在评论区自导自演 (F)", type: "F" },
+            { text: "由于太尴尬，想连夜联系马斯克搬离地球 (T)", type: "T" },
+            { text: "开始像素级复盘分手细节，试图证明全是对方的错 (S)", type: "S" },
+            { text: "脑补TA现在正抱着新欢哭着求我原谅的狗血剧情 (N)", type: "N" }
+        ] 
+    },
+    { 
+        q: "如果你中了500万，你会告诉对象吗？", 
+        opts: [
+            { text: "会，但在那之前我会先注销所有社交账号原地失踪 (P)", type: "P" },
+            { text: "不会，我会买10个计算器算算怎么理财到下个世纪 (J)", type: "J" },
+            { text: "告诉TA，然后观察TA是先抱我还是先抱钱 (T)", type: "T" },
+            { text: "直接带TA去商场，让TA体验一回什么是资本主义的爱 (E)", type: "E" }
+        ] 
+    },
+    { 
+        q: "在社交场合，你的状态通常是？", 
+        opts: [
+            { text: "孔雀开屏，全场最靓且最吵的那个显眼包 (E)", type: "E" },
+            { text: "角落里的蘑菇，由于太想回家已经开始报警了 (I)", type: "I" },
+            { text: "优雅地审视全场，内心OS：这一届人类不行 (T)", type: "T" },
+            { text: "社恐但假装忙碌，对着黑掉的手机屏幕点头微笑 (S)", type: "S" }
+        ] 
+    },
+    { 
+        q: "伴侣问：我今天有什么不一样？你的反应是？", 
+        opts: [
+            { text: "开始脑补这是不是对方要分手/出轨的前奏 (N)", type: "N" },
+            { text: "掏出手机调出昨天照片，开始100倍放大对比找茬 (S)", type: "S" },
+            { text: "“除了更美了，难道你整容了？” (F)", type: "F" },
+            { text: "“不知道，但我建议你下次直接发个补丁说明” (T)", type: "T" }
+        ] 
+    },
+    { 
+        q: "你认为“纯爱”的定义是？", 
+        opts: [
+            { text: "是我这辈子最后的救命稻草和信仰 (F)", type: "F" },
+            { text: "是脑子进水后产生的化学幻觉 (T)", type: "T" },
+            { text: "是银行卡余额归零后的无奈借口 (S)", type: "S" },
+            { text: "是两人在宇宙尽头一起喝西北风的虚无感 (N)", type: "N" }
+        ] 
+    },
+    { 
+        q: "对方回消息慢了，你会？", 
+        opts: [
+            { text: "在脑子里把跟TA孩子的名字和墓地都想好了 (N)", type: "N" },
+            { text: "觉得TA可能在跟别人开黑，并考虑要不要加入 (S)", type: "S" },
+            { text: "每隔5秒刷新一次，心碎得跟二维码似的 (I)", type: "I" },
+            { text: "反手发一个“？”，然后开启轰炸模式 (E)", type: "E" }
+        ] 
+    },
+    { 
+        q: "你的房间通常长什么样？", 
+        opts: [
+            { text: "像刚被10只哈士奇跨国拆迁过一样 (P)", type: "P" },
+            { text: "强迫症看了都要跪下磕头的整洁度 (J)", type: "J" },
+            { text: "表面光鲜亮丽，柜子门一开能砸死人 (E)", type: "E" },
+            { text: "充满了我这个艺术家独特的颓废美感 (N)", type: "N" }
+        ] 
+    },
+    { 
+        q: "聚会时有人主动搭讪，你会？", 
+        opts: [
+            { text: "开启社交牛逼症，当场给人表演个胸口碎大砖 (E)", type: "E" },
+            { text: "假装在回复一个涉及500万跨国贸易的紧急合同 (I)", type: "I" },
+            { text: "职业病发作，开始反向调研对方的年收入和征信 (T)", type: "T" },
+            { text: "“你好，你是哪个星座的？咱俩八字合吗？” (F)", type: "F" }
+        ] 
+    },
+    { 
+        q: "如果恋爱是一场游戏，你是？", 
+        opts: [
+            { text: "氪金无数、倾家荡产的纯情冤大头 (F)", type: "F" },
+            { text: "挂机随缘、不主动不拒绝的白嫖怪 (P)", type: "P" },
+            { text: "熟练掌握所有攻略、一心只想速通的代练 (J)", type: "J" },
+            { text: "冷眼旁观别人炸鱼的满级NPC (I)", type: "I" }
+        ] 
+    },
+    { 
+        q: "对方说“我们谈谈吧”，你第一反应？", 
+        opts: [
+            { text: "想好如何全方位无死角反击并让对方哑口无言 (T)", type: "T" },
+            { text: "想好怎么跪得圆滑且有诚意地道歉 (F)", type: "F" },
+            { text: "脑补了30集《甄嬛传》级别的宫斗戏码 (N)", type: "N" },
+            { text: "确认一下银行卡密码有没有改 (S)", type: "S" }
+        ] 
+    },
+    { 
+        q: "去新餐厅吃饭，你会？", 
+        opts: [
+            { text: "必须看遍30个APP的差评才敢下单 (S)", type: "S" },
+            { text: "看名字哪个顺眼、哪个玄学点哪个 (N)", type: "N" },
+            { text: "直接问服务员哪个最贵，不求最好但求最贵 (E)", type: "E" },
+            { text: "坐在角落里等别人点完我捡漏 (I)", type: "I" }
+        ] 
+    },
+    { 
+        q: "你如何处理前任留下的东西？", 
+        opts: [
+            { text: "留着当传家宝，每晚睹物思人反复折磨自己 (F)", type: "F" },
+            { text: "反手挂上闲鱼，主打一个“前任不值钱，东西换点钱” (T)", type: "T" },
+            { text: "扔进垃圾桶，并录个视频发到抖音配上励志BGM (E)", type: "E" },
+            { text: "锁进柜子深处，等10年后再拿出来考古 (J)", type: "J" }
+        ] 
+    },
+    { 
+        q: "对于“备胎”这个身份，你觉得？", 
+        opts: [
+            { text: "只要轮得到我，那就是我纯爱战神的胜利 (F)", type: "F" },
+            { text: "你在开什么国际玩笑？我是要做海王的人 (E)", type: "E" },
+            { text: "作为Plan B，我应该收取一定的服务费 (T)", type: "T" },
+            { text: "反正也是闲着，就当参加恋爱实训课了 (P)", type: "P" }
+        ] 
+    },
+    { 
+        q: "工作日闹钟响了，你会？", 
+        opts: [
+            { text: "再睡5分钟，直到睡出一种天荒地老的宿命感 (P)", type: "P" },
+            { text: "原地弹起，像赶着去拯救世界的英雄一样出发 (J)", type: "J" },
+            { text: "盯着天花板思考人活着的意义究竟是什么 (N)", type: "N" },
+            { text: "发个朋友圈吐槽，然后继续装死 (E)", type: "E" }
+        ] 
+    },
+    { 
+        q: "如果要在荒岛生活一年，你选？", 
+        opts: [
+            { text: "带个能聊天的伴侣，哪怕被烦死也好过孤单死 (E)", type: "E" },
+            { text: "带个离线版维基百科，试图在荒岛建立文明 (I)", type: "I" },
+            { text: "带一套求生工具，我可是看过全集贝爷的人 (S)", type: "S" },
+            { text: "带个镜子，每天对着镜子练习我的绝世演技 (N)", type: "N" }
+        ] 
+    },
+    { 
+        q: "你更偏向于？", 
+        opts: [
+            { text: "相信直觉，我觉得那个算命先生说得对 (N)", type: "N" },
+            { text: "相信事实，你拿不出证据我就当你是在画大饼 (S)", type: "S" },
+            { text: "相信心情，只要我高兴，真相不重要 (F)", type: "F" },
+            { text: "相信逻辑，哪怕结论很狗屎我也能接受 (T)", type: "T" }
+        ] 
+    },
+    { 
+        q: "吵架后，你通常会？", 
+        opts: [
+            { text: "把对方拉黑5分钟再拉回来，主打一个心理博弈 (P)", type: "P" },
+            { text: "连夜赶出一份3000字的复盘报告给对方审阅 (J)", type: "J" },
+            { text: "躲在被窝里默默流泪，脑补自己是苦情剧女主角 (F)", type: "F" },
+            { text: "打游戏/刷剧，假装对方这个人根本不存在 (T)", type: "T" }
+        ] 
+    },
+    { 
+        q: "你觉得自己更像？", 
+        opts: [
+            { text: "总是莫名其妙发热且坏掉的情感感应器 (F)", type: "F" },
+            { text: "内存不足、运行缓慢但嘴硬的冰冷计算器 (T)", type: "T" },
+            { text: "一个只会复读“好的/收到/行吧”的打字机 (S)", type: "S" },
+            { text: "一个24小时循环播放白日梦的投影仪 (N)", type: "N" }
+        ] 
+    },
+    { 
+        q: "对方问：你在干嘛？你的真实想法：", 
+        opts: [
+            { text: "TA是不是想我了？TA是不是要约我了？ (N)", type: "N" },
+            { text: "这就是一句没话找话的废话 (S)", type: "S" },
+            { text: "TA一定是想管我借钱，绝对是 (T)", type: "T" },
+            { text: "终于有人理我了！快给TA讲讲我今天的离奇经历 (E)", type: "E" }
+        ] 
+    },
+    { 
+        q: "你对浪漫的定义是？", 
+        opts: [
+            { text: "银行卡余额后面多了一个零 (S)", type: "S" },
+            { text: "两人在宇宙尽头手牵手喝西北风 (N)", type: "N" },
+            { text: "在暴雨中大声表白，哪怕被当成神经病 (F)", type: "F" },
+            { text: "一份完美的、不需要我动脑子的日程表 (J)", type: "J" }
+        ] 
+    },
+    { 
+        q: "你最害怕的事情是？", 
+        opts: [
+            { text: "手机电量低于1%，且方圆十里没有充电宝 (S)", type: "S" },
+            { text: "被这个世界彻底遗忘，连AI都不记得我 (N)", type: "N" },
+            { text: "在熟人面前摔了个大马趴 (E)", type: "E" },
+            { text: "突然被告白，打乱了我单身的完美计划 (I)", type: "I" }
+        ] 
+    },
+    { 
+        q: "你在朋友圈发的照片通常？", 
+        opts: [
+            { text: "修图两小时，发文两分钟，然后秒删 (F)", type: "F" },
+            { text: "随手一拍，原汁原味得像监控摄像头截下来的 (T)", type: "T" },
+            { text: "发一堆精心构思的废片，展示我的艺术审美 (N)", type: "N" },
+            { text: "全方位展示我的高质量生活（虽然是拼的） (E)", type: "E" }
+        ] 
+    },
+    { 
+        q: "面对突发状况，你会？", 
+        opts: [
+            { text: "当场石化，原地发疯并开始怀疑整个人生 (F)", type: "F" },
+            { text: "立刻启动备选方案B，冷酷得像个杀手 (T)", type: "T" },
+            { text: "先发个动态/朋友圈求救 (E)", type: "E" },
+            { text: "随遇而安，反正世界毁灭也不是我能管的 (P)", type: "P" }
+        ] 
+    },
+    { 
+        q: "你认为恋爱最理想的状态是？", 
+        opts: [
+            { text: "生生世世锁死，把钥匙扔进太平洋 (J)", type: "J" },
+            { text: "保持神秘感，下一个也许更乖 (P)", type: "P" },
+            { text: "两个人各玩各的手机，互不干扰 (I)", type: "I" },
+            { text: "一起去蹦迪，当全场最野的情侣 (E)", type: "E" }
+        ] 
+    },
+    { 
+        q: "你在人群中更倾向于？", 
+        opts: [
+            { text: "疯狂带节奏，让所有人都围着我转 (E)", type: "E" },
+            { text: "高级透明背景板，希望大家都看不见我 (I)", type: "I" },
+            { text: "那个冷眼观察别人翻车的吃瓜群众 (T)", type: "T" },
+            { text: "那个因为同情别人而尴尬到想钻地的圣母 (F)", type: "F" }
+        ] 
+    },
+    { 
+        q: "如果能穿越，你想去？", 
+        opts: [
+            { text: "未来，看看我到底暴富了没有 (N)", type: "N" },
+            { text: "古代，去当个有房有田的闲散王爷 (S)", type: "S" },
+            { text: "上周，去阻止那个乱花钱的傻逼自己 (T)", type: "T" },
+            { text: "平行时空，看看另一个我也许活得很精彩 (F)", type: "F" }
+        ] 
+    },
+    { 
+        q: "你如何看待“早安/晚安”？", 
+        opts: [
+            { text: "必不可少的仪式感，缺一次我就觉得你不爱了 (J)", type: "J" },
+            { text: "没话找话的尴尬，甚至觉得像是在打卡上班 (P)", type: "P" },
+            { text: "一种监控对方是否还在喘气的手段 (T)", type: "T" },
+            { text: "展示我温柔贴心人设的好机会 (F)", type: "F" }
+        ] 
+    },
+    { 
+        q: "你的社交能量大概能维持？", 
+        opts: [
+            { text: "续航一整天，甚至还能给别人充个电 (E)", type: "E" },
+            { text: "三分钟就想找个插座把自己埋了 (I)", type: "I" },
+            { text: "取决于对方的长相和财力 (T)", type: "T" },
+            { text: "取决于当时的氛围够不够Drama (N)", type: "N" }
+        ] 
+    },
+    { 
+        q: "面对不回消息的人，你会？", 
+        opts: [
+            { text: "在心里给TA办一场盛大的葬礼 (F)", type: "F" },
+            { text: "觉得TA可能真的死了，并在考虑要不要报警 (T)", type: "T" },
+            { text: "疯狂刷屏，直到对方回一个“？” (E)", type: "E" },
+            { text: "直接拉黑，并在日记里写下TA的罪状 (J)", type: "J" }
+        ] 
+    },
+    { 
+        q: "你喜欢的约会地点是？", 
+        opts: [
+            { text: "人声鼎沸、可以蹦迪的闹市区 (E)", type: "E" },
+            { text: "只有两个人的地下防空洞或者深山老林 (I)", type: "I" },
+            { text: "具有浓厚历史底蕴且适合拍照发朋友圈的博物馆 (N)", type: "N" },
+            { text: "路边摊烤串店，主打一个真实 (S)", type: "S" }
+        ] 
+    },
+    { 
+        q: "对于理财，你的态度是？", 
+        opts: [
+            { text: "钱是赚出来的，省钱是对生命的不尊重 (P)", type: "P" },
+            { text: "每一分钱都要去向明确，记账是我的修行 (J)", type: "J" },
+            { text: "买彩票，把未来寄托在概率论上 (N)", type: "N" },
+            { text: "存钱，为了以后跑路的时候能买张好机票 (S)", type: "S" }
+        ] 
+    },
+    { 
+        q: "如果被伴侣背叛了，你会？", 
+        opts: [
+            { text: "默默流泪并反思：是不是我太完美了吓到TA了 (F)", type: "F" },
+            { text: "让TA知道花儿为什么这样红，且证据确凿 (T)", type: "T" },
+            { text: "立刻找下一任，主打一个效率 (E)", type: "E" },
+            { text: "消失，让TA这辈子都活在对我的愧疚中 (N)", type: "N" }
+        ] 
+    },
+    { 
+        q: "你觉得自己的灵魂颜色是？", 
+        opts: [
+            { text: "五彩斑斓的多巴胺彩色，甚至有点反光 (N)", type: "N" },
+            { text: "高级感十足但看起来就很穷的灰色 (S)", type: "S" },
+            { text: "充满爱意（其实是憋屈）的粉红色 (F)", type: "F" },
+            { text: "冷酷到底的电子黑 (T)", type: "T" }
+        ] 
+    },
+    { 
+        q: "你相信星座/塔罗吗？", 
+        opts: [
+            { text: "相信，这是我唯一的行为准则和甩锅工具 (F)", type: "F" },
+            { text: "不信，那是骗韭菜的概率学把戏 (T)", type: "T" },
+            { text: "看心情，顺着我说的我就信 (P)", type: "P" },
+            { text: "偶尔用来当社交话题，仅此而已 (S)", type: "S" }
+        ] 
+    },
+    { 
+        q: "当你完成这个测试，你想？", 
+        opts: [
+            { text: "立刻发给所有人显摆，并强迫大家互看结果 (E)", type: "E" },
+            { text: "自己偷偷看，如果结果不好我就再测一遍 (I)", type: "I" },
+            { text: "开始研究这背后的算法逻辑 (T)", type: "T" },
+            { text: "感叹人生真是寂寞如雪 (N)", type: "N" }
+        ] 
+    }
+];
+
+let pool=[],i=0;
+let score = {
+    E:0, I:0,
+    S:0, N:0,
+    T:0, F:0,
+    J:0, P:0
+};
+
+function start(){
+    pool = [...allQuestions].sort(()=>Math.random()-0.5);
+    document.getElementById("start").classList.add("hidden");
+    document.getElementById("quiz").classList.remove("hidden");
+    next();
+}
+
+function next(){
+    if(i >= pool.length){show();return;}
+    let item=pool[i];
+    document.getElementById("q").innerText=item.q;
+
+    let html="";
+    item.opts.forEach(o=>{
+        html+=`<div class="option" onclick="tap('${o.type}')">${o.text}</div>`;
+    });
+
+    document.getElementById("opts").innerHTML=html;
+    document.getElementById("bar").style.width=(i/pool.length*100)+"%";
+}
+
+function tap(t){
+    score[t]++;
+    i++;
+    next();
+}
+
+function show(){
+    document.getElementById("quiz").classList.add("hidden");
+    document.getElementById("res").classList.remove("hidden");
+
+    // 1. 计算真实的 MBTI Code
+    let code = "";
+    code += score.E >= score.I ? "E" : "I";
+    code += score.S >= score.N ? "S" : "N";
+    code += score.T >= score.F ? "T" : "F";
+    code += score.J >= score.P ? "J" : "P";
+
+    // 2. 极致抽象版羞辱数据库（全新发疯版）
+    const sbtiDB = {
+        "ENFP": { tag: "赛博吗喽 / 情绪漏勺", level: "SSS", desc: "每天在发疯和确诊之间徘徊，大脑像被哈士奇啃过。谈恋爱纯靠脑补，只要对方喘气你就能磕到。" },
+        "INTJ": { tag: "碳基主板 / 孤寡活化石", level: "A+", desc: "建议直接把脑子捐给中科院。你的浪漫细胞在娘胎里就夭折了，谈恋爱像在做核酸，主打一个公事公办。" },
+        "INFJ": { tag: "赛博活佛 / 顶级内耗大佐", level: "S", desc: "白天普度众生，半夜偷偷破防。内心戏多到能拉动全国GDP，你不是在谈恋爱，你是在渡劫。" },
+        "ENTP": { tag: "职业抬杠员 / 互联网发癫天才", level: "A", desc: "活着的唯一目的就是反驳别人。如果哪天你谈恋爱了，那一定是因为你想找个专属的辩论沙袋。" },
+        "INFP": { tag: "互联网小丑 / 幻觉系纯爱", level: "S", desc: "你的眼泪能解决中东缺水问题。天天活在伤感文学里，被渣男/女骗去嘎腰子还怪刀子不够快。" },
+        "ISTP": { tag: "纯血牛马 / 莫得感情的电钻", level: "B+", desc: "你的心比大润发杀了十年的鱼还冷。你不需要爱情，你需要一把趁手的扳手和永远不弹消息的微信。" },
+        "ISFJ": { tag: "舔狗祖师爷 / 免费人工护工", level: "A", desc: "只要对象一皱眉，你连遗书都替自己写好了。别人谈恋爱图开心，你谈恋爱图一个能当牛做马的机会。" },
+        "ESTP": { tag: "街溜子VIP / 精神黄毛", level: "S", desc: "脑子里只有多巴胺和低级趣味，道德底线比马里亚纳海沟还深。建议直接锁死在夜店，别出来祸害良家。" },
+        "ISFP": { tag: "退堂鼓鼓手 / 究极鸵鸟", level: "C", desc: "遇到一点挫折就想连夜扛着火车跑路。你的社交电量比手机掉得还快，恋爱对你来说属于高危极限运动。" },
+        "ENTJ": { tag: "铁血资本家 / 赛博阎王", level: "SSS", desc: "连接吻都要计算投资回报率。你不需要伴侣，你需要的是一个能帮你24小时打工的免费牛马。" },
+        "ISTJ": { tag: "出土文物 / AI成精", level: "B", desc: "你的生活无趣到连鬼都不想缠着你。你的每一天都在复刻昨天，建议找个Excel表格结婚，绝对忠诚。" },
+        "ENFJ": { tag: "太平洋警察 / 圣光发射器", level: "A+", desc: "管天管地还要管对象拉几次屎。你那泛滥的同情心能淹没整个亚洲，恋爱谈得像在做传销洗脑。" },
+        "ESFP": { tag: "单细胞草履虫 / 噪音制造机", level: "A", desc: "大脑平滑得像溜冰场，永远在咋咋呼呼。如果你突然安静了，那绝对是脑干缺失的症状发作了。" },
+        "ESTJ": { tag: "随地大小爹 / 封建残余", level: "S", desc: "动不动就开启颐指气使模式，控制欲强到恨不得给对象装个GPS。跟你谈恋爱属于变相服刑。" },
+        "INTP": { tag: "异次元盲流子 / 人类观察员", level: "B+", desc: "脑部常年处于量子叠加态。你连自己今天吃什么都搞不明白，恋爱这种三维生物的复杂活动建议你直接放弃。" },
+        "ESFJ": { tag: "舔狗收容所长 / 迎宾大喇叭", level: "B", desc: "讨好型人格晚期，为了不被孤立能把灵魂切碎了分给路人。你的自我意识大概在三岁那年就离家出走了。" },
+        "ENFP": { tag: "多情野狗 / 恋爱脑本脑", level: "S", desc: "只要对方招招手，你能把自己骗走。脑子里全是多巴胺，本质是个浪漫的废物。" },
+        "INTJ": { tag: "孤独死预定 / 人间清醒", level: "A+", desc: "与其谈恋爱，你宁愿跟 AI 讨论宇宙毁灭。这种性格建议直接入土为安，省得祸害凡人。" },
+        "INFJ": { tag: "精神病院长 / 深度内耗怪", level: "S", desc: "内心戏足以拿18个奥斯卡，现实中连个招呼都不敢打。每天都在救赎和毁灭世界间反复横跳。" },
+        "ENTP": { tag: "杠精转世 / 法外狂徒", level: "A", desc: "恋爱里你不是在找对象，而是在找辩论对手。为了赢，你甚至可以把自己杠死。" },
+        "INFP": { tag: "泪失禁废柴 / 纯爱冤种", level: "S", desc: "看到路边的野草枯了都能哭三小时。当代黛玉，纯爱战神，但只敢在心里打仗。" },
+        "ISTP": { tag: "纯正构屎 / 关我屁事专家", level: "B+", desc: "建议跟螺丝刀结婚，它至少不会问你为什么不回消息。人狠话不多，主打一个冷漠。" },
+        "ISFJ": { tag: "顶级舔狗 / 妈系舍友", level: "A", desc: "照顾完巨婴还要擦地。你在恋爱里充满了母性光辉，是真正的‘自我感动’天花板。" },
+        "ESTP": { tag: "街头混子 / 派对生化武器", level: "S", desc: "只要好玩，你连自己都能卖了。你的忠诚度取决于下一场派对什么时候开始。" },
+        "ISFP": { tag: "退堂鼓表演艺术家", level: "C", desc: "遇到问题的第一反应是跑。你的才华都用来美化自己的怂，是真正的躲避球冠军。" },
+        "ENTJ": { tag: "无情割韭机 / 情感包工头", level: "S", desc: "对象在你眼里只是一个待优化的指标。如果对方不进步，你可能会当场把TA‘开除’。" },
+        "ISTJ": { tag: "老古董机器人 / 无聊至尊", level: "B", desc: "你的浪漫大概就是按颜色分类收纳内裤。生活规律得像个闹钟，无聊得让人想报警。" },
+        "ENFJ": { tag: "圣母癌晚期 / 情感扶贫办", level: "A+", desc: "普度众生到让自己憋屈死。你不是在谈恋爱，你是在搞扶贫，建议去开个慈善机构。" },
+        "ESFP": { tag: "多动症显眼包", level: "A", desc: "安静一秒钟都会死。你的存在就是为了让周围的人感到尴尬，社交界的生化武器。" },
+        "ESTJ": { tag: "爹味控制狂 / 军事化恋爱", level: "S", desc: "所有人必须按你的规矩来。与其说你在谈恋爱，不如说你在招募下属并进行训练。" },
+        "INTP": { tag: "人间游魂 / 异次元废人", level: "B+", desc: "失踪了基本就是在研究‘猫为什么有四条腿’。活在自己的世界里，恋爱对你来说太麻烦。" },
+        "ESFJ": { tag: "社交交际花 / 讨好型人格", level: "B", desc: "为了合群可以把灵魂卖了。你的自我已经丢在上一场饭局里找不到了。" }
+    };
+
+    const result = sbtiDB[code] || { tag: "未知生物", level: "???", desc: "你的属性过于抽象，系统无法识别。" };
+
+    // 3. 随机一个羞辱性后缀
+    const suffix = [
+        "恋爱危险指数：98%",
+        "高风险情感人格，建议注销身份",
+        "极易让人上头（物理意义上的）",
+        "建议谨慎恋爱，最好单身到老",
+        "情绪波动偏高，建议联系心理医生"  
+    ];
+    let suf = suffix[Math.floor(Math.random()*suffix.length)];
+
+    // 4. 渲染
+    document.getElementById("code").innerText = code + " · " + result.tag;
+    document.getElementById("title").innerText = "危险等级：" + result.level;
+    document.getElementById("desc").innerHTML = result.desc + "<br><br><strong>【" + suf + "】</strong>";
+}
+
+</script>
+
+</body>
+</html>
